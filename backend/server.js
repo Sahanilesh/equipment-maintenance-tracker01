@@ -22,6 +22,10 @@ app.use('/api/equipment', equipmentRoutes);
 app.use('/api/work-orders', workOrderRoutes);
 app.use('/api/reports', reportRoutes);
 
+app.get('/', (req, res) => {
+  res.send('OKAY API WORKING');
+});
+
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/equipment-maintenance', {
   useNewUrlParser: true,
@@ -34,3 +38,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
