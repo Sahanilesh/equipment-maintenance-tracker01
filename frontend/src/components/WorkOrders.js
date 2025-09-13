@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -24,13 +24,7 @@ const WorkOrders = () => {
 
   const canCreate = ['supervisor', 'manager'].includes(user.role);
 
-  useEffect(() => {
-    fetchWorkOrders();
-    fetchEquipment();
-    fetchTechnicians();
-  }, [filters]);
-
-  const fetchWorkOrders = async () => {
+  const fetchWorkOrders = useCallback(async () => {
     try {
       const params = new URLSearchParams();
       if (filters.status) params.append('status', filters.status);
@@ -41,18 +35,18 @@ const WorkOrders = () => {
     } catch (error) {
       console.error('Error fetching work orders:', error);
     }
-  };
+  }, [filters]);
 
-  const fetchEquipment = async () => {
+  const fetchEquipment = useCallback(async () => {
     try {
       const response = await axios.get('/api/equipment');
       setEquipment(response.data);
     } catch (error) {
       console.error('Error fetching equipment:', error);
     }
-  };
+  }, []); // No dependencies for fetchEquipment
 
-  const fetchTechnicians = async () => {
+  const fetchTechnicians = useCallback(async () => {
     try {
       const res = await fetch('/api/auth/technicians');
       const data = await res.json();
@@ -60,7 +54,13 @@ const WorkOrders = () => {
     } catch (err) {
       setTechnicians([]);
     }
-  };
+  }, []); // No dependencies for fetchTechnicians
+
+  useEffect(() => {
+    fetchWorkOrders();
+    fetchEquipment();
+    fetchTechnicians();
+  }, [filters, fetchWorkOrders, fetchEquipment, fetchTechnicians]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
